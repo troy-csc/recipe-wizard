@@ -1,66 +1,46 @@
 # Recipe Wizard
 # Program by Troy
 
+import tkinter as tk
 from tkinter import *
 
 class Recipe:
+    def __init__(self, rName):
+        self.rName = rName
     
+    def getRecipeName(self):
+        return self.rName
 
-# matrix for unit conversions
-row, col = 3, 3
-conversionMatrix = [[0 for i in range(col)] for i in range(row)]
-print(conversionMatrix)
+def clearMainFrame(mainFrame):
+    for child in mainFrame.winfo_children():
+        child.destroy()
 
-# setting up matrix
-for row in range(len(conversionMatrix)):
-    for col in range(len(conversionMatrix[row])):
-        if(row==col):
-            conversionMatrix[row][col]=1
-        elif(row<col):
-            if(row==0 and col==1):
-                conversionMatrix[row][col]=0.001
-            elif(row==0 and col==2):
-                conversionMatrix[row][col]=3.281
-            elif(row==1 and col==2):
-                conversionMatrix[row][col]=3281
-        elif(row>col):
-            conversionMatrix[row][col]=1/conversionMatrix[col][row]
+recipeList=[]
 
-# menu for units
-options = [
-    "Metres",
-    "Kilometres",
-    "Feet"
-]
-
-# debugging
-print(conversionMatrix)
+# input: recipe name
+# output: index of recipe
+def createRecipe(rName):
+    recipeList.append(Recipe(rName))
+    return len(recipeList)-1
 
 # initializing root window
-root = Tk()
+root = tk.Tk()
 root.title("Recipe Wizard")
 
-# function to calculate conversion
-def calculate(input, iUnit, oUnit, ansBox):
-    print(iUnit)
-    print(oUnit)
+# setting up root window grid
+root.rowconfigure(0, minsize=800, weight=1)
+root.columnconfigure(1, minsize=800, weight=1)
 
-# Entry for amount
-amountLabel = Label(root, text="Enter an amount: ").grid(row=0, column=0)
-amtEntry = Entry(root, width=25)
-amtEntry.grid(row=0, column=1)
+mainFrame = tk.Frame(root)
+bttnsFrame = tk.Frame(root)
 
-# option for amount unit
-amtUnitName = StringVar()
-amtUnitDrop = OptionMenu(root, amtUnitName, "Metres", "Kilometres", "Feet").grid(row=0, column=2, columnspan=2)
+btn_newRc = tk.Button(bttnsFrame, text="New Recipe").grid(row=0, column=0, pady=2.5, sticky="ew")
+btn_saveRc = tk.Button(bttnsFrame, text="Save").grid(row=1, column=0, sticky="ew", pady=2.5)
+btn_clr = tk.Button(bttnsFrame, text="Clear", command=lambda: clearMainFrame(mainFrame)).grid(row=2, column=0, sticky="ew", pady=2.5)
 
-# option for unit to convert to
-amountLabel = Label(root, text="Choose a unit to convert: ").grid(row=1, column=0)
-cUnitName = StringVar()
-cUnitDrop = OptionMenu(root, cUnitName, "Metres", "Kilometres", "Feet").grid(row=1, column=1, columnspan=2)
+mainFrame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+bttnsFrame.grid(row=0, column=0, sticky="ns", padx=5, pady=5)
 
-# answer box
-ansBox = Entry(root, width=25).grid(row=2, column=1)
-ansButton = Button(root, text="Convert", command=lambda: calculate(amtEntry.get(), amtUnitName, cUnitName, ansBox)).grid(row=2, column=0)
+
 
 root.mainloop()
