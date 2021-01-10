@@ -1,25 +1,38 @@
 # Recipe Wizard
 # Program by Troy
 
+# A python tkinter desktop app to store recipes
+# and convert between measurement units easily
+
+# github link to my account: https://github.com/troy-csc
+# github link to this program: https://github.com/troy-csc/recipe-wizard
+
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter.ttk import Separator
 import sqlite3
 
+# class for a recipe
 class Recipe:
+    # constructor
     def __init__(self, rName):
         self.rName = rName
     
+    # method to get recipe name
     def getRecipeName(self):
         return self.rName
 
+# clears main frame on the main window
 def clearMainFrame(mainFrame):
     for child in mainFrame.winfo_children():
         child.destroy()
 
+# list to store recipes
 recipeList=[]
 
+# list of units relating to weights
+# conversions are stored relative to a gram
 weight_units = [
     ["gram", 1],
     ["kilogram", 0.001],
@@ -27,6 +40,8 @@ weight_units = [
     ["pound", 0.00220462]
 ]
 
+# list of units relating to volume
+# conversions are stored relative to a millilitre
 volume_units = [
     ["millilitre", 1],
     ["litre", 0.001],
@@ -39,25 +54,31 @@ volume_units = [
     ["gallon", 1/3785]
 ]
 
+# global variables for measurement calculator
 inputUnit = "unit"
 outputUnit = "unit"
 
+# function to create a recipe
 # input: recipe name
 # output: index of recipe
 def createRecipe(rName):
     recipeList.append(Recipe(rName))
     return len(recipeList)-1
 
+# new recipe button to display the form in the the main window
 def newRecipe():
     Label(mainFrame, text="Create a New Recipe").pack()
-    Label(mainFrame, text="Enter recipe name: ").pack()
+    Label(mainFrame, text="Enter recipe name:").pack()
     Entry(mainFrame).pack()
 
+# adding numbers to the value entry box
 def inputToEntry(inpEntry, num):
     cur=inpEntry.get()
     inpEntry.delete(0, END)
     inpEntry.insert(0, str(cur) + str(num))
 
+# choosing input unit
+# click button and then click a unit
 def chooseInputUnit(calcWindow, wait_var, inpLabel):
     calcWindow.wait_variable(wait_var)
     global inputUnit
@@ -74,6 +95,8 @@ def chooseInputUnit(calcWindow, wait_var, inpLabel):
         inputUnit = "pound"
         inpLabel.config(text="pound(s)")
 
+# choosing output unit
+# click button and then click a unit
 def chooseOutputUnit(calcWindow, wait_var, outLabel):
     calcWindow.wait_variable(wait_var)
     global outputUnit
@@ -91,13 +114,20 @@ def chooseOutputUnit(calcWindow, wait_var, outLabel):
         outputUnit = "pound"
         outLabel.config(text="pound(s)")
 
+# convert button function
+# converts input to grams
+# converts grams to output unit
 def convert(iVal, oEntry):
     factor = 0.0
+    # loop through units
     for u in weight_units:
+        # find factor to convert input unit to grams
         if(u[0] == inputUnit):
             factor = float(weight_units[weight_units.index(u)][1])
             break
-    nSTDunit = float(iVal) * factor
+    if(inputUnit!="gram"):
+        factor=1/factor
+    nSTDunit = float(iVal) * factor # number of grams in x number of input units
     for u in weight_units:
         print(u)
         print(outputUnit)
@@ -109,6 +139,8 @@ def convert(iVal, oEntry):
     oEntry.delete(0, END)
     oEntry.insert(0, ans)
 
+# creating the measurement calculator window
+# and setting up buttons
 def openCalc():
     calcWindow = tk.Toplevel(height=500, width=500)
     calcWindow.title("Measurement Converter")
@@ -171,9 +203,11 @@ root.title("Recipe Wizard")
 root.rowconfigure(0, minsize=800, weight=1)
 root.columnconfigure(1, minsize=800, weight=1)
 
+# creating frames
 mainFrame = tk.Frame(root)
 bttnsFrame = tk.Frame(root)
 
+# placing buttons are frames on the window using tkinter grid
 btn_newRc = tk.Button(bttnsFrame, text="New Recipe", command=newRecipe).grid(row=0, column=0, pady=2.5, sticky="ew")
 btn_saveRc = tk.Button(bttnsFrame, text="Save").grid(row=1, column=0, sticky="ew", pady=2.5)
 btn_clr = tk.Button(bttnsFrame, text="Clear", command=lambda: clearMainFrame(mainFrame)).grid(row=2, column=0, sticky="ew", pady=2.5)
@@ -181,4 +215,5 @@ btn_calc = tk.Button(bttnsFrame, text="Open Calculator", command=openCalc).grid(
 mainFrame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
 bttnsFrame.grid(row=0, column=0, sticky="ns", padx=5, pady=5)
 
+# main window loop
 root.mainloop()
