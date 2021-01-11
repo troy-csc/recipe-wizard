@@ -57,6 +57,7 @@ volume_units = [
 # global variables for measurement calculator
 inputUnit = "unit"
 outputUnit = "unit"
+unitLock=False
 
 # function to create a recipe
 # input: recipe name
@@ -82,6 +83,7 @@ def inputToEntry(inpEntry, num):
 def chooseInputUnit(calcWindow, wait_var, inpLabel):
     calcWindow.wait_variable(wait_var)
     global inputUnit
+    global unitLock
     if(wait_var.get()==1):
         inputUnit = "gram"
         inpLabel.config(text="gram(s)")
@@ -94,25 +96,84 @@ def chooseInputUnit(calcWindow, wait_var, inpLabel):
     elif(wait_var.get()==4):
         inputUnit = "pound"
         inpLabel.config(text="pound(s)")
+    elif(wait_var.get()>4):
+        unitLock=True
+        if(wait_var.get()==5):
+            inputUnit = "millilitre"
+            inpLabel.config(text="ml(s)")
+        elif(wait_var.get()==6):
+            inputUnit = "litre"
+            inpLabel.config(text="litre(s)")
+        elif(wait_var.get()==7):
+            inputUnit = "decilitre"
+            inpLabel.config(text="decilitre(s)")
+        elif(wait_var.get()==8):
+            inputUnit = "cup"
+            inpLabel.config(text="cup(s)")
+        elif(wait_var.get()==9):
+            inputUnit = "teaspoon"
+            inpLabel.config(text="teaspoon(s)")
+        elif(wait_var.get()==10):
+            inputUnit = "tablespoon"
+            inpLabel.config(text="tablespoon(s)")
+        elif(wait_var.get()==11):
+            inputUnit = "pint"
+            inpLabel.config(text="pint(s)")
+        elif(wait_var.get()==12):
+            inputUnit = "quart"
+            inpLabel.config(text="quart(s)")
+        elif(wait_var.get()==13):
+            inputUnit = "gallon"
+            inpLabel.config(text="gallon(s)")
 
 # choosing output unit
 # click button and then click a unit
 def chooseOutputUnit(calcWindow, wait_var, outLabel):
     calcWindow.wait_variable(wait_var)
     global outputUnit
-    if(wait_var.get()==1):
-        outputUnit = "gram"
-        outLabel.config(text="gram(s)")
-    elif(wait_var.get()==2):
-        outputUnit
-        outputUnit = "kilogram"
-        outLabel.config(text="kilogram(s)")
-    elif(wait_var.get()==3):
-        outputUnit = "ounce"
-        outLabel.config(text="ounce(s)")
-    elif(wait_var.get()==4):
-        outputUnit = "pound"
-        outLabel.config(text="pound(s)")
+    global unitLock
+    if(unitLock==False):
+        if(wait_var.get()==1):
+            outputUnit = "gram"
+            outLabel.config(text="gram(s)")
+        elif(wait_var.get()==2):
+            outputUnit
+            outputUnit = "kilogram"
+            outLabel.config(text="kilogram(s)")
+        elif(wait_var.get()==3):
+            outputUnit = "ounce"
+            outLabel.config(text="ounce(s)")
+        elif(wait_var.get()==4):
+            outputUnit = "pound"
+            outLabel.config(text="pound(s)")
+    else:
+        if(wait_var.get()==5):
+            outputUnit = "millilitre"
+            outLabel.config(text="ml(s)")
+        elif(wait_var.get()==6):
+            outputUnit = "litre"
+            outLabel.config(text="litre(s)")
+        elif(wait_var.get()==7):
+            outputUnit = "decilitre"
+            outLabel.config(text="decilitre(s)")
+        elif(wait_var.get()==8):
+            outputUnit = "cup"
+            outLabel.config(text="cup(s)")
+        elif(wait_var.get()==9):
+            outputUnit = "teaspoon"
+            outLabel.config(text="teaspoon(s)")
+        elif(wait_var.get()==10):
+            outputUnit = "tablespoon"
+            outLabel.config(text="tablespoon(s)")
+        elif(wait_var.get()==11):
+            outputUnit = "pint"
+            outLabel.config(text="pint(s)")
+        elif(wait_var.get()==12):
+            outputUnit = "quart"
+            outLabel.config(text="quart(s)")
+        elif(wait_var.get()==13):
+            outputUnit = "gallon"
+            outLabel.config(text="gallon(s)")
 
 # convert button function
 # converts input to grams
@@ -120,22 +181,37 @@ def chooseOutputUnit(calcWindow, wait_var, outLabel):
 def convert(iVal, oEntry):
     factor = 0.0
     # loop through units
-    for u in weight_units:
-        # find factor to convert input unit to grams
-        if(u[0] == inputUnit):
-            factor = float(weight_units[weight_units.index(u)][1])
-            break
-    if(inputUnit!="gram"):
-        factor=1/factor
-    nSTDunit = float(iVal) * factor # number of grams in x number of input units
-    for u in weight_units:
-        print(u)
-        print(outputUnit)
-        if(u[0] == outputUnit):
-            factor = float(weight_units[weight_units.index(u)][1])
-            print(factor)
-            break
-    ans = nSTDunit * factor
+    if(unitLock==False):
+        for u in weight_units:
+            # find factor to convert input unit to grams
+            if(u[0] == inputUnit):
+                factor = float(weight_units[weight_units.index(u)][1])
+                break
+        if(inputUnit!="gram"):
+            factor=1/factor
+        nSTDunit = float(iVal) * factor # number of grams in x number of input units
+        for u in weight_units:
+            if(u[0] == outputUnit):
+                factor = float(weight_units[weight_units.index(u)][1])
+                break
+        ans = nSTDunit * factor
+    else:
+        for u in volume_units:
+            # find factor to convert input unit to ml
+            print(u)
+            if(u[0] == inputUnit):
+                factor = float(volume_units[volume_units.index(u)][1])
+                break
+        if(inputUnit!="millilitre"):
+            factor=1/factor
+        nSTDunit = float(iVal) * factor # number of ml in x number of input units
+        for u in volume_units:
+            print(u)
+            print(outputUnit)
+            if(u[0] == outputUnit):
+                factor = float(volume_units[volume_units.index(u)][1])
+                break
+        ans = nSTDunit * factor
     oEntry.delete(0, END)
     oEntry.insert(0, ans)
 
@@ -191,9 +267,33 @@ def openCalc():
     wb_2.grid(row=0, column=1)
     wb_3.grid(row=1, column=0)
     wb_4.grid(row=1, column=1)
+    # volume units
+    volUnitFrame = Frame(calcWindow)
+    # define volume buttons
+    vb_1 = Button(volUnitFrame, text="ml", command=lambda: wait_var.set(5))
+    vb_2 = Button(volUnitFrame, text="litre", command=lambda: wait_var.set(6))
+    vb_3 = Button(volUnitFrame, text="decilitre", command=lambda: wait_var.set(7))
+    vb_4 = Button(volUnitFrame, text="cup", command=lambda: wait_var.set(8))
+    vb_5 = Button(volUnitFrame, text="teaspoon", command=lambda: wait_var.set(9))
+    vb_6 = Button(volUnitFrame, text="tablespoon", command=lambda: wait_var.set(10))
+    vb_7 = Button(volUnitFrame, text="pint", command=lambda: wait_var.set(11))
+    vb_8 = Button(volUnitFrame, text="quart", command=lambda: wait_var.set(12))
+    vb_9 = Button(volUnitFrame, text="gallon", command=lambda: wait_var.set(13))
+    # display volume buttons
+    vb_1.grid(row=0, column=0)
+    vb_2.grid(row=0, column=1)
+    vb_3.grid(row=0, column=2)
+    vb_4.grid(row=1, column=0)
+    vb_5.grid(row=1, column=1)
+    vb_6.grid(row=1, column=2)
+    vb_7.grid(row=2, column=0)
+    vb_8.grid(row=2, column=1)
+    vb_9.grid(row=2, column=2)
+    # displaying frames
     displayFrame.grid(row=0, column=0)
     numFrame.grid(row=1, column=0, sticky="w")
-    w_unitFrame.grid(row=1, column=1, sticky="s")
+    w_unitFrame.grid(row=1, column=0, sticky="s")
+    volUnitFrame.grid(row=1, column=0, sticky="e")
 
 # initializing root window
 root = tk.Tk()
