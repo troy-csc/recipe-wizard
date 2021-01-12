@@ -80,10 +80,15 @@ def inputToEntry(inpEntry, num):
 
 # choosing input unit
 # click button and then click a unit
-def chooseInputUnit(calcWindow, wait_var, inpLabel):
+def chooseInputUnit(calcWindow, wait_var, inpLabel, outLabel):
     calcWindow.wait_variable(wait_var)
     global inputUnit
+    global outputUnit
     global unitLock
+    if(unitLock==True):
+        outLabel.config(text="unit(s)")
+        outputUnit="unit"
+    unitLock = False
     if(wait_var.get()==1):
         inputUnit = "gram"
         inpLabel.config(text="gram(s)")
@@ -98,6 +103,8 @@ def chooseInputUnit(calcWindow, wait_var, inpLabel):
         inpLabel.config(text="pound(s)")
     elif(wait_var.get()>4):
         unitLock=True
+        outLabel.config(text="unit(s)")
+        outputUnit="unit"
         if(wait_var.get()==5):
             inputUnit = "millilitre"
             inpLabel.config(text="ml(s)")
@@ -231,7 +238,7 @@ def openCalc():
     outLabel = Label(displayFrame, text="unit(s)")
     outLabel.grid(row=0, column=4)
     wait_var = IntVar()
-    iButton = Button(displayFrame, text="Choose input unit", command=lambda: chooseInputUnit(calcWindow, wait_var, inpLabel)).grid(row=1, column=1)
+    iButton = Button(displayFrame, text="Choose input unit", command=lambda: chooseInputUnit(calcWindow, wait_var, inpLabel, outLabel)).grid(row=1, column=1)
     oButton = Button(displayFrame, text="Choose output unit", command=lambda: chooseOutputUnit(calcWindow, wait_var, outLabel)).grid(row=1, column=4)
     convertButton = Button(displayFrame, text="Convert", command=lambda: convert(inpEntry.get(), outEntry))
     convertButton.grid(row=2, column=2)
